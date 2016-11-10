@@ -223,7 +223,7 @@ namespace Reminder
             }
             foreach (ReminderData note in Manager.DataList.Data)
             {
-                if (!note.TimeNeed && DateTime.Now.CompareTo(note.AlarmDate) >= 0 && note.CreateDate.CompareTo(new DateTime(1970, 1, 1)) > 0)
+                if (note.TimeNeed && DateTime.Now.CompareTo(note.AlarmDate) >= 0 && note.CreateDate.CompareTo(new DateTime(1970, 1, 1)) > 0)
                 {
                     notifications.Add(note);
                     note.TimeNeed = true;
@@ -278,7 +278,7 @@ namespace Reminder
         {
             if (isChanged)
             {
-                DialogResult res = MessageBox.Show("Save changes", "Save change", MessageBoxButtons.YesNoCancel);
+                DialogResult res = MessageBox.Show("Save changes?", "Save change", MessageBoxButtons.YesNoCancel);
                 if (res == DialogResult.Yes)
                 {
                     FileManager.writeData(Manager.DataList.Data);

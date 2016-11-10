@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Reminder.Model;
+using Reminder.Controller;
 
 namespace Reminder
 {
@@ -194,8 +195,8 @@ namespace Reminder
                 cbxHour.SelectedIndex = note.CreateDate.Hour + 1;
                 cbxMinute.SelectedIndex = note.CreateDate.Minute + 1;
                 cbxBeforeDays.SelectedIndex = tmp.Days;
-                cbxBeforeHours.SelectedIndex = tmp.Hours + 1;
-                cbxBeforeMinutes.SelectedIndex = tmp.Minutes + 1;
+                cbxBeforeHours.SelectedIndex = tmp.Hours;
+                cbxBeforeMinutes.SelectedIndex = tmp.Minutes;
             } else
             {
                 btnDontNeedTime_Click(null, null);
@@ -263,7 +264,7 @@ namespace Reminder
                 {
                     string dateStr = (string)cbxDay.SelectedItem + "/" + (string)cbxMonth.SelectedItem + "/" + (string)cbxYear.SelectedItem + " " + (string)cbxHour.SelectedItem + ":" + (string)cbxMinute.SelectedItem;
                     date = Convert.ToDateTime(dateStr);
-                    alarmDate = new DateTime(date.Year, date.Month, date.Day);
+                    alarmDate = date;
 
                     alarmDate.AddDays(-(int)cbxBeforeDays.SelectedItem);
                     alarmDate.AddHours(-(int)cbxBeforeHours.SelectedItem);
@@ -276,6 +277,7 @@ namespace Reminder
                 currentNote = new ReminderData(title, content, date, alarmDate, isTimeNeeded, priority);
                 Manager.DataList.Data.Add(currentNote);
                 MainForm.instance.displayNotesLeft();
+                FileManager.writeData(Manager.DataList.Data);
                 MainForm.instance.addOK();
                 this.Dispose();
             }
