@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Reminder.Model;
+using Reminder.Controller;
 
 namespace Reminder
 {
@@ -250,8 +252,9 @@ namespace Reminder
                 string title = txtTitle.Text;
                 string content = txtContent.Text;
                 int priority = cbxPriority.SelectedIndex;
-                Note note = new Note(date, title, content, !isTimeNeeded, priority, alarmDate);
-                manager.notes.Add(note);
+                ReminderData data = new ReminderData(title, content, date, alarmDate, isTimeNeeded, priority);
+                Manager.DataList.AddData(data);
+                FileManager.writeData(Manager.DataList.Data);
                 MainForm.instance.displayNotesLeft();
                 MainForm.instance.addOK();
                 this.Dispose();

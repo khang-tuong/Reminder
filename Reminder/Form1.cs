@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Reminder.Controller;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Reminder.Model;
 
 namespace Reminder
 {
@@ -14,7 +16,7 @@ namespace Reminder
     {
 
         private TreeNode currentNode;
-        private List<Note> notifications;
+        private List<ReminderData> notifications;
         private Notification notification;
         private bool isShowingNoti = false;
 
@@ -27,69 +29,69 @@ namespace Reminder
             InitializeComponent();
             instance = this;
             manager = new Manager();
-            manager.readFile();
+            FileManager.readData();
             displayNotesLeft();
             iconTray.Icon = new Icon("icon.ico");
             iconTray.Text = "Reminder";
             addContextMenu();
-            notifications = new List<Note>();
+            notifications = new List<ReminderData>();
             notification = new Notification();
-            changeSkin(manager.settings[3][1]);
+            changeSkin(Manager.DataList.Settings.Skin);
         }
 
         public void displayNotesLeft()
         {
             tree1.Nodes.Clear();
             int arrange = manager.arrangeNotes();
-            if (manager.notes.Count != 0)
+            if (Manager.DataList.Data.Count > 0)
             {
                 if (arrange == 1 || arrange == 0)
                 {
-                    DateTime start = manager.notes[0].date;
+                    DateTime start = Manager.DataList.Data[0].CreateDate;
                     TreeNode node;
                     if (start.CompareTo(new DateTime(1970, 1, 1)) == 0)
                     {
                         node = tree1.Nodes.Add("No time needed");
                     } else
-                    node = tree1.Nodes.Add(manager.notes[0].date.Month + " - " + manager.notes[0].date.Year);
-                    foreach (Note note in manager.notes)
+                    node = tree1.Nodes.Add(Manager.DataList.Data[0].CreateDate.Month + " - " + Manager.DataList.Data[0].CreateDate.Year);
+                    foreach (ReminderData note in Manager.DataList.Data)
                     {
-                        if (note.date.Month == start.Month && note.date.Year == start.Year)
+                        if (note.CreateDate.Month == start.Month && note.CreateDate.Year == start.Year)
                         {
-                            TreeNode childNode = node.Nodes.Add(note.title);
+                            TreeNode childNode = node.Nodes.Add(note.Title);
                             childNode.Tag = note;
                         } else
                         {
-                            if (note.date.CompareTo(new DateTime(1970, 1, 1)) == 0)
+                            if (note.CreateDate.CompareTo(new DateTime(1970, 1, 1)) == 0)
                             {
                                 node = tree1.Nodes.Add("No time needed");
                             }
                             else
-                                node = tree1.Nodes.Add(note.date.Month + " - " + note.date.Year);
-                            TreeNode childNode = node.Nodes.Add(note.title);
+                                node = tree1.Nodes.Add(note.CreateDate.Month + " - " + note.CreateDate.Year);
+                            TreeNode childNode = node.Nodes.Add(note.Title);
                             childNode.Tag = note;
-                            start = note.date;
+                            start = note.CreateDate;
                         }
                     }
                 }
                 else if (arrange == 2 || arrange == 3)
                 {
-                    int start = manager.notes[0].priority;
+                    int start = Manager.DataList.Data[0].Priority;
                     TreeNode node;
-                    node = tree1.Nodes.Add(manager.notes[0].priority + "");
-                    foreach (Note note in manager.notes)
+                    node = tree1.Nodes.Add(Manager.DataList.Data[0].Priority + "");
+                    foreach (ReminderData note in Manager.DataList.Data)
                     {
-                        if (note.priority == start)
+                        if (note.Priority == start)
                         {
-                            TreeNode childNode = node.Nodes.Add(note.title);
+                            TreeNode childNode = node.Nodes.Add(note.Title);
                             childNode.Tag = note;
                         }
                         else
                         {
-                            node = tree1.Nodes.Add(note.priority + "");
-                            TreeNode childNode = node.Nodes.Add(note.title);
+                            node = tree1.Nodes.Add(note.Priority + "");
+                            TreeNode childNode = node.Nodes.Add(note.Title);
                             childNode.Tag = note;
-                            start = note.priority;
+                            start = note.Priority;
                         }
                     }
                 }
@@ -98,12 +100,12 @@ namespace Reminder
 
         private void printContent()
         {
-            Note note = (Note)currentNode.Tag;
+            ReminderData note = (ReminderData)currentNode.Tag;
             if (note != null)
             {
                 txtContent.Clear();
-                txtTitle.Text = note.title;
-                txtContent.Text = note.content + "\n";
+                txtTitle.Text = note.Title;
+                txtContent.Text = note.Content + "\n";
                 timer1_Tick(null, new EventArgs());
             }
         }
@@ -164,19 +166,19 @@ namespace Reminder
         {
             if (currentNode != null)
             {
-                Note note = (Note)currentNode.Tag;
-                if (note.content != txtContent.Text)
+                ReminderData note = (ReminderData)currentNode.Tag;
+                if (note.Content != txtContent.Text)
                 {
-                    note.content = txtContent.Text;
+                    note.Content = txtContent.Text;
                 }
-                if (note.title != txtTitle.Text)
+                if (note.Title != txtTitle.Text)
                 {
-                    note.title = txtTitle.Text;
+                    note.Title = txtTitle.Text;
                 }
             }
             try
             {
-                manager.writeFile();
+                FileManager.writeData(Manager.DataList.Data);
                 isChanged = false;
                 lbStatus.Text = "Saved!";
             }
@@ -205,11 +207,11 @@ namespace Reminder
         {
             if (currentNode != null && currentNode.GetNodeCount(false) == 0)
             {
-                Note currentNote = (Note)currentNode.Tag;
-                if (currentNote.date.CompareTo(new DateTime(1970, 1, 1)) > 0)
+                ReminderData currentNote = (ReminderData)currentNode.Tag;
+                if (currentNote.CreateDate.CompareTo(new DateTime(1970, 1, 1)) > 0)
                 {
-                    TimeSpan timeleft = currentNote.date - DateTime.Now;
-                    if (DateTime.Now.CompareTo(currentNote.date) >= 0)
+                    TimeSpan timeleft = currentNote.CreateDate - DateTime.Now;
+                    if (DateTime.Now.CompareTo(currentNote.CreateDate) >= 0)
                     {
                         txtTimeLeft.Text = "Overdue " + timeleft.Days + " Days " + -timeleft.Hours + " hours " + -timeleft.Minutes + " minutes " + -timeleft.Seconds;
                     } else
@@ -219,21 +221,21 @@ namespace Reminder
                     txtTimeLeft.Clear();
                 }
             }
-            foreach (Note note in manager.notes)
+            foreach (ReminderData note in Manager.DataList.Data)
             {
-                if (!note.isNotified && DateTime.Now.CompareTo(note.alarmDate) >= 0 && note.date.CompareTo(new DateTime(1970, 1, 1)) > 0)
+                if (!note.TimeNeed && DateTime.Now.CompareTo(note.AlarmDate) >= 0 && note.CreateDate.CompareTo(new DateTime(1970, 1, 1)) > 0)
                 {
                     notifications.Add(note);
-                    note.isNotified = true;
+                    note.TimeNeed = true;
                 }
                 
             }
             if (notifications.Count != 0 && !isShowingNoti)
             {
                 iconTray.BalloonTipText = "You have incoming events: \n";
-                foreach (Note note2 in notifications)
+                foreach (ReminderData note2 in notifications)
                 {
-                    iconTray.BalloonTipText += note2.title + "\n";
+                    iconTray.BalloonTipText += note2.Title + "\n";
                 }
                 iconTray.ShowBalloonTip(500);
                 iconTray.BalloonTipClicked += new EventHandler(notifier_Click);
@@ -245,9 +247,9 @@ namespace Reminder
         {
             notification.show(notifications);
             notification.Show();
-            manager.writeFile();
-            manager.notes.Clear();
-            manager.readFile();
+            FileManager.writeData(Manager.DataList.Data);
+            Manager.DataList.Data.Clear();
+            FileManager.readData();
             notifications.Clear();
         }
 
@@ -256,7 +258,7 @@ namespace Reminder
             if (currentNode != null)
             {
                 TreeNode parentNode = currentNode.Parent;
-                manager.notes.Remove((Note)currentNode.Tag);
+                Manager.DataList.Data.Remove((ReminderData)currentNode.Tag);
                 tree1.Nodes.Remove(currentNode);
                 currentNode = tree1.Nodes[0];
                 txtContent.Clear(); txtTimeLeft.Clear();
@@ -279,7 +281,7 @@ namespace Reminder
                 DialogResult res = MessageBox.Show("Save changes", "Save change", MessageBoxButtons.YesNoCancel);
                 if (res == DialogResult.Yes)
                 {
-                    manager.writeFile();
+                    FileManager.writeData(Manager.DataList.Data);
                 }
                 else if (res == DialogResult.No)
                 {
@@ -328,7 +330,7 @@ namespace Reminder
         {
             if (currentNode != null)
             {
-                Note note = (Note)currentNode.Tag;
+                ReminderData note = (ReminderData)currentNode.Tag;
                 SettingNode settingNode = new SettingNode();
                 settingNode.manager = this.manager;
                 settingNode.setText(note);
@@ -338,7 +340,7 @@ namespace Reminder
 
         private void preferencesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Setting setting = new Setting();
+            SettingForm setting = new SettingForm();
             setting.manager = this.manager;
             setting.setUp();
             setting.Show();

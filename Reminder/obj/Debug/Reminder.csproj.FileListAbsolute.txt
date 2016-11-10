@@ -13,4 +13,4 @@ D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.TaskbarNotifier.resources
 D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.Notifier.resources
 D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.Notification.resources
 D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.SettingNode.resources
-D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.Setting.resources
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.SettingForm.resources

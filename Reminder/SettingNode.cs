@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Reminder.Model;
 
 namespace Reminder
 {
@@ -14,7 +15,7 @@ namespace Reminder
     {
         public bool isTimeNeeded;
         public Manager manager = null;
-        private Note currentNote;
+        private ReminderData currentNote;
 
         public SettingNode()
         {
@@ -177,21 +178,21 @@ namespace Reminder
             this.cbxBeforeMinutes.SelectedIndex = 0;
         }
 
-        public void setText(Note note)
+        public void setText(ReminderData note)
         {
             currentNote = note;
-            txtTitle.Text = note.title;
-            txtContent.Text = note.content;
-            cbxPriority.SelectedIndex = note.priority;
-            if (note.date.CompareTo(new DateTime(1970, 1, 1)) != 0)
+            txtTitle.Text = note.Title;
+            txtContent.Text = note.Content;
+            cbxPriority.SelectedIndex = note.Priority;
+            if (note.CreateDate.CompareTo(new DateTime(1970, 1, 1)) != 0)
             {
-                TimeSpan tmp = note.date.Subtract(note.alarmDate);
+                TimeSpan tmp = note.CreateDate.Subtract(note.AlarmDate);
                 isTimeNeeded = true;
-                cbxYear.SelectedIndex = note.date.Year - DateTime.Now.Year + 1;
-                cbxMonth.SelectedIndex = note.date.Month;
-                cbxDay.SelectedIndex = note.date.Day;
-                cbxHour.SelectedIndex = note.date.Hour + 1;
-                cbxMinute.SelectedIndex = note.date.Minute + 1;
+                cbxYear.SelectedIndex = note.CreateDate.Year - DateTime.Now.Year + 1;
+                cbxMonth.SelectedIndex = note.CreateDate.Month;
+                cbxDay.SelectedIndex = note.CreateDate.Day;
+                cbxHour.SelectedIndex = note.CreateDate.Hour + 1;
+                cbxMinute.SelectedIndex = note.CreateDate.Minute + 1;
                 cbxBeforeDays.SelectedIndex = tmp.Days;
                 cbxBeforeHours.SelectedIndex = tmp.Hours + 1;
                 cbxBeforeMinutes.SelectedIndex = tmp.Minutes + 1;
@@ -271,9 +272,9 @@ namespace Reminder
                 string title = txtTitle.Text;
                 string content = txtContent.Text;
                 int priority = cbxPriority.SelectedIndex;
-                manager.notes.Remove(currentNote);
-                currentNote = new Note(date, title, content, !isTimeNeeded, priority, alarmDate);
-                manager.notes.Add(currentNote);
+                Manager.DataList.Data.Remove(currentNote);
+                currentNote = new ReminderData(title, content, date, alarmDate, isTimeNeeded, priority);
+                Manager.DataList.Data.Add(currentNote);
                 MainForm.instance.displayNotesLeft();
                 MainForm.instance.addOK();
                 this.Dispose();

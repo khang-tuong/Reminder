@@ -7,14 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Reminder.Controller;
 
 namespace Reminder
 {
-    public partial class Setting : Form
+    public partial class SettingForm : Form
     {
         public Manager manager;
 
-        public Setting()
+        public SettingForm()
         {
             InitializeComponent();
             addTreeDateTimeFormat();
@@ -42,35 +43,21 @@ namespace Reminder
 
         public void setUp()
         {
-            foreach (String[] setting in manager.settings)
-            {
-                if (setting[0] == "TreeViewArrangeBy")
-                {
-                    string tmp = setting[1];
-                    cbxTreeArrangeBy.SelectedItem = tmp;
-                }
-                else if (setting[0] == "TreeType")
-                {
-                    string tmp = setting[1];
-                    cbxTreeType.SelectedItem = tmp;
-                }
-                else if (setting[0] == "Skin")
-                {
-                    cbxSkin.SelectedItem = setting[1];
-                }
-            }
+            cbxTreeArrangeBy.SelectedItem = Manager.DataList.Settings.TreeViewArrangeBy;
+            cbxTreeType.SelectedItem = Manager.DataList.Settings.TreeType;
+            cbxSkin.SelectedItem = Manager.DataList.Settings.Skin;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
             string treeArrangeBy = (string)cbxTreeArrangeBy.SelectedItem;
             string treetype = (string)cbxTreeType.SelectedItem;
-            manager.settings[1][1] = treeArrangeBy == "Date" ? "Date" : "Priority";
-            manager.settings[2][1] = treetype == "Ascend" ? "Ascend" : "Descend";
-            manager.settings[3][1] = (string)cbxSkin.SelectedItem;
+            Manager.DataList.Settings.TreeViewArrangeBy = treeArrangeBy == "Date" ? "Date" : "Priority";
+            Manager.DataList.Settings.TreeType = treetype == "Ascend" ? "Ascend" : "Descend";
+            Manager.DataList.Settings.Skin = (string)cbxSkin.SelectedItem;
             MainForm.instance.displayNotesLeft();
             MainForm.instance.changeSkin((string)cbxSkin.SelectedItem);
-            manager.writeSettings();
+            FileManager.writeSettings();
             this.Dispose();
         }
     }
