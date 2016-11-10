@@ -1,0 +1,16 @@
+D:\Coding\C#\Reminder\Reminder\bin\Debug\Reminder.exe.config
+D:\Coding\C#\Reminder\Reminder\bin\Debug\Reminder.exe
+D:\Coding\C#\Reminder\Reminder\bin\Debug\Reminder.pdb
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.csprojResolveAssemblyReference.cache
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.Properties.Resources.resources
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.csproj.GenerateResource.Cache
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.exe
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.pdb
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.AddForm.resources
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.MainForm.resources
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.resources.resources
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.TaskbarNotifier.resources
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.Notifier.resources
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.Notification.resources
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.SettingNode.resources
+D:\Coding\C#\Reminder\Reminder\obj\Debug\Reminder.Setting.resources

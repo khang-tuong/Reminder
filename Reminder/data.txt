@@ -1,0 +1,21 @@
+1/1/1970 0:0
+dfbdfbdb
+dfbdfbfdbfdbfdb;;;đéo
+True
+1
+1/1/1970 0:0
+
+17/1/2016 15:50
+Java Web Day 1
+load driver để hệ thống đang sử dụng database loại gì.;;;mỗi table = 1 DAO.;;;Method GET: readonly;;;Parameter: giá trị truyền từ client tới server, luôn là string, readonly, truyền về cặp name = val. Nếu parameter trùng tên thì server nhận một mảng string[]. Parameter = null khi ko tồn tại (ko chọn). Submit là nút lệnh truyền về server;;;
+True
+1
+17/1/2016 14:50
+
+29/1/2016 11:40
+Database
+Bảng User:;;;  Thêm cột Username;;;;;;  Xóa cột isServing
+True
+5
+29/1/2016 0:0
+
