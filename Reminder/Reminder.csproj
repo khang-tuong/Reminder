@@ -53,6 +53,7 @@
       <DependentUpon>AddForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Config\Configuration.cs" />
+    <Compile Include="Config\Enum.cs" />
     <Compile Include="Controller\FileManager.cs" />
     <Compile Include="controls.cs" />
     <Compile Include="Model\Setting.cs" />

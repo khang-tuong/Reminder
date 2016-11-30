@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Reminder.Model;
+using Reminder.Config;
 
 namespace Reminder
 {
@@ -18,7 +19,7 @@ namespace Reminder
         private TreeNode currentNode;
         private List<ReminderData> notifications;
         private Notification notification;
-        private bool isShowingNoti = false;
+        private bool isShowing = false;
 
         public bool isChanged = false;
         public static MainForm instance;
@@ -30,6 +31,7 @@ namespace Reminder
             instance = this;
             manager = new Manager();
             FileManager.readData();
+            FileManager.ReadSettings();
             displayNotesLeft();
             iconTray.Icon = new Icon("icon.ico");
             iconTray.Text = "Reminder";
@@ -47,30 +49,30 @@ namespace Reminder
             {
                 if (arrange == 1 || arrange == 0)
                 {
-                    DateTime start = Manager.DataList.Data[0].CreateDate;
+                    DateTime start = Manager.DataList.Data[0].AlarmDate;
                     TreeNode node;
                     if (start.CompareTo(new DateTime(1970, 1, 1)) == 0)
                     {
                         node = tree1.Nodes.Add("No time needed");
                     } else
-                    node = tree1.Nodes.Add(Manager.DataList.Data[0].CreateDate.Month + " - " + Manager.DataList.Data[0].CreateDate.Year);
+                    node = tree1.Nodes.Add(Manager.DataList.Data[0].AlarmDate.Month + " - " + Manager.DataList.Data[0].AlarmDate.Year);
                     foreach (ReminderData note in Manager.DataList.Data)
                     {
-                        if (note.CreateDate.Month == start.Month && note.CreateDate.Year == start.Year)
+                        if (note.AlarmDate.Month == start.Month && note.AlarmDate.Year == start.Year)
                         {
                             TreeNode childNode = node.Nodes.Add(note.Title);
                             childNode.Tag = note;
                         } else
                         {
-                            if (note.CreateDate.CompareTo(new DateTime(1970, 1, 1)) == 0)
+                            if (note.AlarmDate.CompareTo(new DateTime(1970, 1, 1)) == 0)
                             {
                                 node = tree1.Nodes.Add("No time needed");
                             }
                             else
-                                node = tree1.Nodes.Add(note.CreateDate.Month + " - " + note.CreateDate.Year);
+                                node = tree1.Nodes.Add(note.AlarmDate.Month + " - " + note.AlarmDate.Year);
                             TreeNode childNode = node.Nodes.Add(note.Title);
                             childNode.Tag = note;
-                            start = note.CreateDate;
+                            start = note.AlarmDate;
                         }
                     }
                 }
@@ -208,10 +210,10 @@ namespace Reminder
             if (currentNode != null && currentNode.GetNodeCount(false) == 0)
             {
                 ReminderData currentNote = (ReminderData)currentNode.Tag;
-                if (currentNote.CreateDate.CompareTo(new DateTime(1970, 1, 1)) > 0)
+                if (currentNote.AlarmDate.CompareTo(new DateTime(1970, 1, 1)) > 0)
                 {
-                    TimeSpan timeleft = currentNote.CreateDate - DateTime.Now;
-                    if (DateTime.Now.CompareTo(currentNote.CreateDate) >= 0)
+                    TimeSpan timeleft = currentNote.AlarmDate - DateTime.Now;
+                    if (DateTime.Now.CompareTo(currentNote.AlarmDate) >= 0)
                     {
                         txtTimeLeft.Text = "Overdue " + timeleft.Days + " Days " + -timeleft.Hours + " hours " + -timeleft.Minutes + " minutes " + -timeleft.Seconds;
                     } else
@@ -223,14 +225,30 @@ namespace Reminder
             }
             foreach (ReminderData note in Manager.DataList.Data)
             {
-                if (note.TimeNeed && DateTime.Now.CompareTo(note.AlarmDate) >= 0 && note.CreateDate.CompareTo(new DateTime(1970, 1, 1)) > 0)
+                DateTime now = DateTime.Now;
+                now = now.AddTicks(-(now.Ticks % TimeSpan.TicksPerSecond));
+                if (note.TimeNeed && now.CompareTo(note.AlarmDate) >= 0 && !isShowing)
                 {
-                    notifications.Add(note);
-                    note.TimeNeed = true;
+                    if (note.AlarmStatus == (int) AlarmStatusEnum.Alarmed)
+                    {
+                        if (!note.SnoozeNeed || (now.Ticks - note.AlarmDate.Ticks) % note.SnoozeTime.Ticks == 0)
+                            notifications.Add(note);
+                    }
+                    else if (note.AlarmStatus == (int)AlarmStatusEnum.New)
+                    {
+                        notifications.Add(note);
+                        if (note.SnoozeNeed)
+                        {
+                            note.AlarmStatus = (int) AlarmStatusEnum.Alarmed;
+                        } else
+                        {
+                            note.AlarmStatus = (int)AlarmStatusEnum.Showed;
+                        }
+                    }
                 }
                 
             }
-            if (notifications.Count != 0 && !isShowingNoti)
+            if (notifications.Count != 0 && !isShowing)
             {
                 iconTray.BalloonTipText = "You have incoming events: \n";
                 foreach (ReminderData note2 in notifications)
@@ -239,14 +257,25 @@ namespace Reminder
                 }
                 iconTray.ShowBalloonTip(500);
                 iconTray.BalloonTipClicked += new EventHandler(notifier_Click);
-                isShowingNoti = true;
+                iconTray.BalloonTipClosed += IconTray_BalloonTipClosed;
+                isShowing = true;
             }
+        }
+
+        private void IconTray_BalloonTipClosed(object sender, EventArgs e)
+        {
+            this.isShowing = false;
+            notifications.Clear();
         }
 
         private void notifier_Click(object sender, EventArgs e)
         {
             notification.show(notifications);
             notification.Show();
+            foreach (var item in notifications)
+            {
+                item.AlarmStatus = (int)AlarmStatusEnum.Showed;
+            }
             FileManager.writeData(Manager.DataList.Data);
             Manager.DataList.Data.Clear();
             FileManager.readData();
@@ -255,22 +284,26 @@ namespace Reminder
 
         private void btnRemove_Click(object sender, EventArgs e)
         {
-            if (currentNode != null)
+            DialogResult r = MessageBox.Show("Are you sure want to delete this note?", "Confirm delete", MessageBoxButtons.YesNo);
+            if (r == DialogResult.OK)
             {
-                TreeNode parentNode = currentNode.Parent;
-                Manager.DataList.Data.Remove((ReminderData)currentNode.Tag);
-                tree1.Nodes.Remove(currentNode);
-                currentNode = tree1.Nodes[0];
-                txtContent.Clear(); txtTimeLeft.Clear();
-                lbStatus.Text = "Removed!";
-                if (parentNode.GetNodeCount(false) == 0)
+                if (currentNode != null)
                 {
-                    tree1.Nodes.Remove(parentNode);
+                    TreeNode parentNode = currentNode.Parent;
+                    Manager.DeleteData((ReminderData)currentNode.Tag);
+                    tree1.Nodes.Remove(currentNode);
+                    currentNode = tree1.Nodes[0];
+                    txtContent.Clear(); txtTimeLeft.Clear();
+                    lbStatus.Text = "Removed!";
+                    if (parentNode.GetNodeCount(false) == 0)
+                    {
+                        tree1.Nodes.Remove(parentNode);
+                    }
+                    isChanged = true;
+                } else
+                {
+                    lbStatus.Text = "Nothing to remove!";
                 }
-                isChanged = true;
-            } else
-            {
-                lbStatus.Text = "Nothing to remove!";
             }
         }
 

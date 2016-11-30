@@ -187,20 +187,20 @@
             this.normalToolStripMenuItem,
             this.darkToolStripMenuItem});
             this.changeSkinToolStripMenuItem.Name = "changeSkinToolStripMenuItem";
-            this.changeSkinToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.changeSkinToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
             this.changeSkinToolStripMenuItem.Text = "Change skin";
             // 
             // normalToolStripMenuItem
             // 
             this.normalToolStripMenuItem.Name = "normalToolStripMenuItem";
-            this.normalToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.normalToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.normalToolStripMenuItem.Text = "Normal";
             this.normalToolStripMenuItem.Click += new System.EventHandler(this.normalToolStripMenuItem_Click);
             // 
             // darkToolStripMenuItem
             // 
             this.darkToolStripMenuItem.Name = "darkToolStripMenuItem";
-            this.darkToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.darkToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.darkToolStripMenuItem.Text = "Dark";
             this.darkToolStripMenuItem.Click += new System.EventHandler(this.darkToolStripMenuItem_Click);
             // 
@@ -317,7 +317,6 @@
             // timer1
             // 
             this.timer1.Enabled = true;
-            this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // lbStatus
@@ -345,7 +344,7 @@
             this.btnSettings.Name = "btnSettings";
             this.btnSettings.Size = new System.Drawing.Size(95, 34);
             this.btnSettings.TabIndex = 3;
-            this.btnSettings.Text = "Settings";
+            this.btnSettings.Text = "Edit";
             this.btnSettings.UseVisualStyleBackColor = true;
             this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
             // 

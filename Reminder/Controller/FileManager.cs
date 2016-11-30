@@ -14,31 +14,51 @@ namespace Reminder.Controller
     {
         public static void readData()
         {
+            FileStream stream = null;
             try
             {
-                FileStream stream = File.Open(Configuration.DATA_FILE_PATH, FileMode.OpenOrCreate, FileAccess.Read);
+                stream = File.Open(Configuration.DATA_FILE_PATH, FileMode.OpenOrCreate, FileAccess.Read);
                 if (stream.Length > 0)
                 {
                     BinaryFormatter formatter = new BinaryFormatter();
                     Manager.DataList.Data = (List<ReminderData>)formatter.Deserialize(stream);
-                    stream.Dispose();
-                    stream.Close();
                 }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            } finally
+            {
+                stream.Dispose();
+                stream.Close();
+            }
+
+           
+        }
+
+        public static void ReadSettings()
+        {
+            FileStream stream = null;
+            try
+            {
                 stream = File.Open(Configuration.SETTING_FILE_PATH, FileMode.OpenOrCreate, FileAccess.Read);
                 if (stream.Length > 0)
                 {
                     BinaryFormatter formatter = new BinaryFormatter();
                     Manager.DataList.Settings = (Setting)formatter.Deserialize(stream);
-                    stream.Dispose();
-                    stream.Close();
                 }
             }
             catch (Exception e)
             {
                 throw e;
             }
+            finally
+            {
+                stream.Dispose();
+                stream.Close();
+            }
 
-           
+
         }
 
         public static void writeData(List<ReminderData> list)
