@@ -285,7 +285,7 @@ namespace Reminder
         private void btnRemove_Click(object sender, EventArgs e)
         {
             DialogResult r = MessageBox.Show("Are you sure want to delete this note?", "Confirm delete", MessageBoxButtons.YesNo);
-            if (r == DialogResult.OK)
+            if (r == DialogResult.Yes)
             {
                 if (currentNode != null)
                 {
